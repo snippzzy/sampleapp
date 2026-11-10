@@ -54,7 +54,7 @@ jobs:
       - name: Secret Information
         run: echo "Value of secret matches - ${{ secrets.Azure_PUBLISH_PROFILE || 'Placeholder' }}"
 
-      - name: Print name of App Service to deploy to
+      - name: Print name of App Service to deploy to App Name
         run: echo "App will be deployed to ${{ vars.APP_NAME }}"
         
       - name: List files in root directory
