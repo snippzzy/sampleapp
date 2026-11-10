@@ -1,0 +1,39 @@
+name: Reusable Workflow for building and deploying .NET app to Azure Web App
+
+on:
+  workflow_call:
+    inputs:
+        PACKAGE_NAME:
+            required: false
+            type: string
+        APP_NAME:
+            required: true
+            type: string
+        PUBLISH_DIR:
+            required: true
+            type: string
+        DEPLOYMENT_SLOT:
+            required: false
+            type: string
+    secrets:
+      Azure_PUBLISH_PROFILE:
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download published app
+        uses: actions/download-artifact@v4
+        with:
+          name: published-app
+          path: ${{ inputs.PUBLISH_DIR }}
+
+      - name: Print name of App Service to deploy to App Name
+        run: echo "App will be deployed to ${{ inputs.APP_NAME }}"
+
+      - name: List files in root directory
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path . | ForEach-Object { Write-Output $_.Name }

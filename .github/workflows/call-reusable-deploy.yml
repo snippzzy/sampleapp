@@ -1,0 +1,51 @@
+name: Build and call Reusable Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: 10.0.x
+  PROJECT_PATH: sampleapp/sampleapp.csproj
+  PUBLISH_DIR: ./publish
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish --configuration Release --no-build --output ${{ env.PUBLISH_DIR }}
+
+      - name: Upload published app
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-app
+          path: ${{ env.PUBLISH_DIR }}
+          if-no-files-found: error
+
+  call-reusable-deployment-workflow:
+    needs: build
+
+    uses: ./.github/workflows/resuable-deploy.yml
+    with:
+      APP_NAME: .net-app
+      PUBLISH_DIR: ./publish
+    secrets:
+      Azure_PUBLISH_PROFILE: ${{ secrets.Azure_PUBLISH_PROFILE }}
