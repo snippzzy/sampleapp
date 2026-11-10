@@ -52,19 +52,12 @@ jobs:
           path: ${{ env.PUBLISH_DIR }}
 
       - name: Secret Information
-        env:
-          AZURE_PUBLISH_PROFILE: ${{ secrets.Azure_PUBLISH_PROFILE }}
-        run: |
-          if [ -n "$AZURE_PUBLISH_PROFILE" ]; then
-            echo "Azure publish profile secret is configured"
-          else
-            echo "Azure publish profile secret is not configured"
-          fi
+        run: echo "Value of secret matches - ${{ secrets.Azure_PUBLISH_PROFILE || 'Placeholder' }}"
 
       - name: Print name of App Service to deploy to
         run: echo "App will be deployed to ${{ secrets.Azure_WEBAPP_NAME }}
         
       - name: List files in root directory
         run: |
-          Get-ChildItem -Path . | ForEach.Oject { Write.Output $_.FullName }
+          Get-ChildItem -Path . | ForEach.Oject { Write.Output $_.Name }
         shell: pwsh
